@@ -23,6 +23,7 @@ module.exports = {
     output:{
         path: pathResolve('./dist'),
         filename: 'index.js',
+        publicPath: './',
     },
     module: {
         rules: [
