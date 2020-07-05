@@ -22,7 +22,7 @@ module.exports = {
     entry:['@babel/polyfill', './src/index.js'],
     output:{
         path: pathResolve('./dist'),
-        filename: 'index.js'
+        filename: 'index.js',
     },
     module: {
         rules: [

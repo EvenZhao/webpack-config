@@ -8,6 +8,7 @@ const initStoreState = {
     userInfo: {
         like: '',
     },
+    userName:'',
     pageInfo: {
     },
 }
@@ -17,6 +18,23 @@ const syncAction = (type, payload) => {
         type,
         payload,
     };
+};
+
+const asyncAction = (type) => {
+    if (type === 'userInfo') {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const res = { like: 'yy' };
+                syncAction('USER_INFO', res);
+                resolve();
+            }, 1000);
+        });
+    } else if (type === 'pageInfo') {
+        setTimeout(() => {
+            const res = { };
+            syncAction('PAGE_INFO', res);
+        }, 1000);
+    } 
 }
 
 const userInfoReducer = function(state,  action) {
@@ -30,18 +48,33 @@ const userInfoReducer = function(state,  action) {
     return state || null;
 }
 
+const userNameReducer = function(state,  action) {
+    console.log(action,state)
+    if (action.type === 'USER_NAME') {
+        if(Object.prototype.toString.call(action.payload)=="[object Object]"){
+           return {
+               ...state,
+            ...action.payload
+           } 
+       } else {
+            return action.payload
+       }
+    }
+    return state || null;
+}
+
 const pageInfoReducer = function(state,  action) {
     if (action.type === 'PAGE_INFO') {
         return {
             ...state,
-            ...action.payload
+            ..._action.payload
         }
     }
 
     return state || null;
 }
 
-const rootReducer = combineReducers({ userInfo: userInfoReducer, pageInfo: pageInfoReducer })
+const rootReducer = combineReducers({ userInfo: userInfoReducer, pageInfo: pageInfoReducer,userName:userNameReducer })
 
 // create store
 const store = createStore(rootReducer, initStoreState);
@@ -92,18 +125,18 @@ class UserInfoPage extends React.Component {
                 <ConnectUserInfo />
                 <ConnectUserInfoInput />
             </>
-                    
         ) 
     }
-    
 }
 
 class RecommendList extends React.Component {    
     render() {
         const { like } = this.props.userInfo;
+        const { userName } = this.props;
         console.log(this.props)
         return (
             <ul>
+                <li>{userName}</li>
                 {
                     like 
                     ?
@@ -118,12 +151,17 @@ class RecommendList extends React.Component {
 const ConnectRecommendList = connect(mapStateToProps)(RecommendList);
 
 class App extends React.Component {    
-    componentDidMount() {
-        setTimeout(() => {
-            this.props.dispatch(syncAction('USER_INFO', {
-                like: '茅台',
-            }));
-        }, 1000);
+    async componentDidMount() {
+        await this.props.dispatch(asyncAction('USER_INFO'));
+        // this.props.dispatch(asyncAction('PAGE_INFO'));
+        // this.props.dispatch(asyncAction('PAGE_INFO', 'USER_INFO'));
+        // console.log();
+
+
+
+        // setTimeout(() => {
+        //     this.props.dispatch(syncAction('USER_NAME', 'yy'));
+        // }, 1000);
     }
 
     render() {
